@@ -15,7 +15,7 @@ from pykafka.common import OffsetType
 from threading import Thread
 import json
 from sqlalchemy import and_
-
+import time 
 
 import mysql.connector
 import pymysql
@@ -143,10 +143,26 @@ def process_messages():
 
     hostname = "%s:%d" % (app_config["events"]["hostname"],
                           app_config["events"]["port"])
-    client = KafkaClient(hosts=hostname)
+    
+    retry_count = 0
+    max_retries: app_config["kafka"]["max_retries"]
+    while retry_count < max_retries:
+        try:            
+            print(f"Trying to connect to Kafka. Attempt #{retry_count + 1}")
+            client = KafkaClient(hosts=hostname)
+            topic = client.topics[str.encode(app_config["events"]["topic"])]
+            break
+        except Exception as e:
+            print(f"Failed to connect to Kafka. Error: {str(e)}")
+            sleep_time = app_config["kafka"]["sleep_seconds"]
+            print(f"Retrying in {sleep_time} seconds...")
+            time.sleep(sleep_time)
 
-    topic = client.topics[str.encode(app_config["events"]["topic"])]
+            retry_count += 1
 
+    if retry_count == max_retries:
+        print(f"Failed to connect to Kafka after {max_retries} attempts.")   
+                
 
     consumer = topic.get_simple_consumer(consumer_group=b'event_group',
                                          reset_offset_on_start=False,
