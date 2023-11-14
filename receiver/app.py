@@ -54,14 +54,10 @@ client, topic = connect_to_kafka(
     app_config)
 
 def get_kafka_producer():
-    return topic.get_sync_producer()
-
-def reconnect_to_kafka():
-    global client, topic
-    logger.info("Reconnecting to Kafka...")
     client, topic = connect_to_kafka(
-        f"{app_config['events']['hostname']}:{app_config['events']['port']}",
-        app_config)
+    f"{app_config['events']['hostname']}:{app_config['events']['port']}",
+    app_config)
+    return topic.get_sync_producer()
 
 def add_book_hold(body): 
     trace_id = str(uuid.uuid4())
@@ -85,7 +81,6 @@ def add_book_hold(body):
         logger.info("Sending the book hold request to Kafka")
     except:
         logger.error(f"Producer stopped. Attempting to reconnect to Kafka.")
-        reconnect_to_kafka()
         producer = get_kafka_producer()
 
         msg = {"type": "book",
@@ -112,7 +107,6 @@ def add_movie_hold(body):
     producer = get_kafka_producer()
 
     try:
-        producer = get_kafka_producer()
         msg = { "type": "movie",
                 "datetime" :
                     datetime.datetime.now().strftime(
@@ -124,7 +118,6 @@ def add_movie_hold(body):
     # logger.info(f"Returned event movie hold request with response {trace_id} with status {response.status_code}")
     except:
         logger.error(f"Producer stopped. Attempting to reconnect to Kafka.")
-        reconnect_to_kafka()        
         producer = get_kafka_producer()
         
         msg = { "type": "movie",
