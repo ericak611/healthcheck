@@ -145,7 +145,7 @@ def process_messages():
                           app_config["events"]["port"])
     
     retry_count = 0
-    max_retries: app_config["kafka"]["max_retries"]
+    max_retries = app_config["kafka"]["max_retries"]
     while retry_count < max_retries:
         try:            
             print(f"Trying to connect to Kafka. Attempt #{retry_count + 1}")
