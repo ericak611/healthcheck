@@ -70,25 +70,16 @@ def add_book_hold(body):
         "trace_id": trace_id,
         **body
     }
-    
-    try:
-        msg = { "type": "book",
-                "datetime" :
-                    datetime.datetime.now().strftime(
-                        "%Y-%m-%dT%H:%M:%S"),
-                "payload": event_object }
-        msg_str = json.dumps(msg)
-        producer.produce(msg_str.encode('utf-8'))
-        logger.info("Sending the book hold request to Kafka")
-    except:
-        logger.error(f"Producer stopped. Attempting to reconnect to Kafka.")
 
-        msg = {"type": "book",
-               "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
-               "payload": event_object}
-        msg_str = json.dumps(msg)
-        producer.produce(msg_str.encode('utf-8'))
-        logger.info("Sent the book hold request to Kafka after reconnect")        
+    msg = { "type": "book",
+            "datetime" :
+                datetime.datetime.now().strftime(
+                    "%Y-%m-%dT%H:%M:%S"),
+            "payload": event_object }
+    msg_str = json.dumps(msg)
+    producer.produce(msg_str.encode('utf-8'))
+    logger.info("Sending the book hold request to Kafka")
+       
 
     # logger.info(f"Returned event movie hold request with response {trace_id} with status {response.status_code}")
     return NoContent, 201
@@ -105,27 +96,15 @@ def add_movie_hold(body):
         **body
     }
 
-    try:
-        msg = { "type": "movie",
-                "datetime" :
-                    datetime.datetime.now().strftime(
-                        "%Y-%m-%dT%H:%M:%S"),
-                "payload": event_object }
-        msg_str = json.dumps(msg)
-        producer.produce(msg_str.encode('utf-8'))
-        logger.info("Sending the movie hold request to Kafka")
-    # logger.info(f"Returned event movie hold request with response {trace_id} with status {response.status_code}")
-    except:
-        logger.error(f"Producer stopped. Attempting to reconnect to Kafka.")
-        
-        msg = { "type": "movie",
-                "datetime" :
-                    datetime.datetime.now().strftime(
-                        "%Y-%m-%dT%H:%M:%S"),
-                "payload": event_object }
-        msg_str = json.dumps(msg)
-        producer.produce(msg_str.encode('utf-8'))
-        logger.info("Sending the moive hold request to Kafka")        
+    msg = { "type": "movie",
+            "datetime" :
+                datetime.datetime.now().strftime(
+                    "%Y-%m-%dT%H:%M:%S"),
+            "payload": event_object }
+    msg_str = json.dumps(msg)
+    producer.produce(msg_str.encode('utf-8'))
+    logger.info("Sending the movie hold request to Kafka")
+    # logger.info(f"Returned event movie hold request with response {trace_id} with status {response.status_code}")      
     return NoContent, 201
 
 app = connexion.FlaskApp(__name__, specification_dir='')
