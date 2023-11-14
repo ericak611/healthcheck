@@ -41,54 +41,6 @@ Base.metadata.bind = DB_ENGINE
 DB_SESSION = sessionmaker(bind=DB_ENGINE)
 
 
-# def add_book_hold(body): 
-#     """ Receives a book hold request"""
-#     message1 = f"Connecting to DB. Hostname: {app_config['datastore']['hostname']}, Port: {app_config['datastore']['port']}"
-#     logger.info(message1)
-#     session = DB_SESSION()
-#     bh = BookHold(body['book_id'],
-#                   body['user_id'],
-#                   body['branch_id'],
-#                   body['availability'],
-#                   body['timestamp'],
-#                   body['trace_id'])
-    
-#     session.add(bh)
-
-#     session.commit()
-#     session.close()
-
-#     message2 = f"Receievd event book hold request with trace_id: {body['trace_id']}"
-#     logger.debug(message2)
-
-#     return NoContent, 201
-
-
-# def add_movie_hold(body):
-#     """ Receives a movie hold request"""
-#     message1 = f"Connecting to DB. Hostname: {app_config['datastore']['hostname']}, Port: {app_config['datastore']['port']}"
-#     logger.info(message1)
-
-#     session = DB_SESSION()
-#     mh = MovieHold(body['movie_id'],
-#                   body['user_id'],
-#                   body['branch_id'],
-#                   body['availability'],
-#                   body['timestamp'],
-#                   body['trace_id'])
-    
-#     session.add(mh)
-
-#     session.commit()
-#     session.close()
-
-#     message1 = f"Receievd event movie hold request with trace_id: {body['trace_id']}"
-#     message2 = f"Connecting to DB. Hostname: {app_config['datastore']['hostname']}, Port: {app_config['datastore']['port']}"
-
-#     logger.info(message2)    
-
-
-#     return NoContent, 201
 
 def get_book_hold(start_timestamp, end_timestamp):
     """ Gets new book hold requests after the timestamp """
@@ -148,20 +100,20 @@ def process_messages():
     max_retries = app_config["kafka"]["max_retries"]
     while retry_count < max_retries:
         try:            
-            print(f"Trying to connect to Kafka. Attempt #{retry_count + 1}")
+            logger.info(f"Trying to connect to Kafka. Attempt #{retry_count + 1}")
             client = KafkaClient(hosts=hostname)
             topic = client.topics[str.encode(app_config["events"]["topic"])]
             break
         except Exception as e:
-            print(f"Failed to connect to Kafka. Error: {str(e)}")
+            logger.info(f"Failed to connect to Kafka. Error: {str(e)}")
             sleep_time = app_config["kafka"]["sleep_seconds"]
-            print(f"Retrying in {sleep_time} seconds...")
+            logger.info(f"Retrying in {sleep_time} seconds...")
             time.sleep(sleep_time)
 
             retry_count += 1
 
     if retry_count == max_retries:
-        print(f"Failed to connect to Kafka after {max_retries} attempts.")   
+        logger.info(f"Failed to connect to Kafka after {max_retries} attempts.")   
                 
 
     consumer = topic.get_simple_consumer(consumer_group=b'event_group',
