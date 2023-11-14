@@ -14,7 +14,7 @@ from pykafka import KafkaClient
 from pykafka.common import OffsetType
 from threading import Thread
 import json
-
+from sqlalchemy import and_
 
 
 import mysql.connector
@@ -90,15 +90,17 @@ DB_SESSION = sessionmaker(bind=DB_ENGINE)
 
 #     return NoContent, 201
 
-def get_book_hold(timestamp):
+def get_book_hold(start_timestamp, end_timestamp):
     """ Gets new book hold requests after the timestamp """
     message1 = f"Connecting to DB. Hostname: {app_config['datastore']['hostname']}, Port: {app_config['datastore']['port']}"
     logger.info(message1)
     session = DB_SESSION()
     
-    timestamp_datetime = datetime.datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S.%f')
-    
-    book_hold_requests = session.query(BookHold).filter(BookHold.date_created >= timestamp_datetime)
+    start_timestamp_datetime = datetime.datetime.strptime(start_timestamp, '%Y-%m-%d %H:%M:%S.%f')
+    end_timestamp_datetime = datetime.datetime.strptime(end_timestamp, '%Y-%m-%d %H:%M:%S.%f')
+
+    book_hold_requests = session.query(BookHold).filter(and_(BookHold.date_created >= start_timestamp_datetime, 
+                                                             BookHold.date_created < end_timestamp_datetime))
     book_requests_list = []
 
     for hold in book_hold_requests:
@@ -106,21 +108,24 @@ def get_book_hold(timestamp):
     
     session.close()
 
-    logger.info("Query for book hold requests after %s returns %d results" % (timestamp, len(book_requests_list)))
+    logger.info("Query for book hold requests after %s returns %d results" % (start_timestamp, len(book_requests_list)))
     
     # logger.info(f"Connecting to DB. Hostname: {app_config['datastore']['hostname']}, Port: app_config['datastore']['port']")    
     print(book_requests_list)
     return book_requests_list, 200
 
-def get_movie_hold(timestamp):
+def get_movie_hold(start_timestamp, end_timestamp):
     """ Gets new movie hold requests after the timestamp """
     message1 = f"Connecting to DB. Hostname: {app_config['datastore']['hostname']}, Port: {app_config['datastore']['port']}"
     logger.info(message1)
     session = DB_SESSION()
 
-    timestamp_datetime = datetime.datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S.%f')
+    start_timestamp_datetime = datetime.datetime.strptime(start_timestamp, '%Y-%m-%d %H:%M:%S.%f')
+    end_timestamp_datetime = datetime.datetime.strptime(end_timestamp, '%Y-%m-%d %H:%M:%S.%f')
     
-    movie_hold_requests = session.query(MovieHold).filter(MovieHold.date_created >= timestamp_datetime)
+    movie_hold_requests = session.query(MovieHold).filter(and_(MovieHold.date_created >= start_timestamp_datetime, 
+                                                               MovieHold.date_created < end_timestamp_datetime))    
+    
     movie_requests_list = []
 
     for hold in movie_hold_requests:

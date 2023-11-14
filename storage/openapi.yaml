@@ -39,13 +39,20 @@ paths:
       summary: gets a book hold request
       description: Gets book hold request added after a timestamp
       parameters:
-        - name: timestamp
+        - name: start_timestamp
           in: query 
           description: Limits the number of items on a page
           schema:
             type: string
             format: date-time
             example: 2016-08-29T09:12:33.001Z
+        - name: end_timestamp
+          in: query 
+          description: Limits the number of items on a page
+          schema:
+            type: string
+            format: date-time
+            example: 2016-08-29T09:12:33.001Z            
       operationId: app.get_book_hold
       responses:
         "200":
@@ -91,13 +98,20 @@ paths:
       summary: gets a movie hold request
       description: Gets movie hold request added after a timestamp
       parameters:
-        - name: timestamp
+        - name: start_timestamp
           in: query 
           description: Limits the number of items on a page
           schema:
             type: string
             format: date-time
             example: 2016-08-29T09:12:33.001Z
+        - name: end_timestamp
+          in: query 
+          description: Limits the number of items on a page
+          schema:
+            type: string
+            format: date-time
+            example: 2016-08-29T09:12:33.001Z 
       operationId: app.get_movie_hold
       responses:
         "200":
