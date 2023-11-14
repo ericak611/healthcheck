@@ -36,7 +36,9 @@ def connect_to_kafka(hostname, app_config):
             logger.info(f"Trying to connect to Kafka. Attempt #{retry_count + 1}")
             client = KafkaClient(hosts=f"{hostname}")
             topic = client.topics[str.encode(app_config["events"]["topic"])]
-            return client, topic
+            producer = topic.get_sync_producer()
+            logger.info(f"Successfully connected to Kafka.")
+            return producer
         except Exception as e:
             logger.error(f"Connection to Kafka failed. Error: {str(e)}")
             sleep_time = app_config["kafka"]["sleep_seconds"]
@@ -49,15 +51,15 @@ def connect_to_kafka(hostname, app_config):
     return None, None
 
 # Create KafkaClient when Receiver Service starts up
-client, topic = connect_to_kafka(
+producer = connect_to_kafka(
     f"{app_config['events']['hostname']}:{app_config['events']['port']}",
     app_config)
 
-def get_kafka_producer():
-    client, topic = connect_to_kafka(
-    f"{app_config['events']['hostname']}:{app_config['events']['port']}",
-    app_config)
-    return topic.get_sync_producer()
+# def get_kafka_producer():
+#     client, topic = connect_to_kafka(
+#     f"{app_config['events']['hostname']}:{app_config['events']['port']}",
+#     app_config)
+#     return topic.get_sync_producer()
 
 def add_book_hold(body): 
     trace_id = str(uuid.uuid4())
@@ -68,7 +70,6 @@ def add_book_hold(body):
         "trace_id": trace_id,
         **body
     }
-    producer = get_kafka_producer()
     
     try:
         msg = { "type": "book",
@@ -81,7 +82,6 @@ def add_book_hold(body):
         logger.info("Sending the book hold request to Kafka")
     except:
         logger.error(f"Producer stopped. Attempting to reconnect to Kafka.")
-        producer = get_kafka_producer()
 
         msg = {"type": "book",
                "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
@@ -104,7 +104,6 @@ def add_movie_hold(body):
         "trace_id": trace_id,
         **body
     }
-    producer = get_kafka_producer()
 
     try:
         msg = { "type": "movie",
@@ -118,7 +117,6 @@ def add_movie_hold(body):
     # logger.info(f"Returned event movie hold request with response {trace_id} with status {response.status_code}")
     except:
         logger.error(f"Producer stopped. Attempting to reconnect to Kafka.")
-        producer = get_kafka_producer()
         
         msg = { "type": "movie",
                 "datetime" :
