@@ -34,19 +34,24 @@ def populate_stats():
     'max_mh_availability': 0,
     'last_updated': '2010-10-10 11:17:50.225086'
     }
-    
+
     if os.path.exists(app_config['datastore']['filename']) :
         with open(app_config['datastore']['filename'], 'r') as file:
             hold_requests = json.load(file)
 
+    current_datetime = datetime.datetime.now()
+    timestamp_datetime = current_datetime.strftime('%Y-%m-%d %H:%M:%S.%f')
+
     book_response = requests.get(
         app_config['eventstore']['url']+"/book",
-        params={"timestamp": hold_requests['last_updated']}
+        params={"start_timestamp": hold_requests['last_updated'],
+                "end_timestamp": timestamp_datetime}
     )
 
     movie_response = requests.get(
         app_config['eventstore']['url']+"/movie",
-        params={"timestamp": hold_requests['last_updated']}
+        params={"start_timestamp": hold_requests['last_updated'],
+                "end_timestamp": timestamp_datetime}
     )
 
     # Log based on status code 
@@ -82,8 +87,8 @@ def populate_stats():
     hold_requests['max_bh_availability'] = new_book_max + current_book_max
     hold_requests['max_mh_availability'] = new_movie_max + current_movie_max
 
-    current_datetime = datetime.datetime.now()
-    timestamp_datetime = current_datetime.strftime('%Y-%m-%d %H:%M:%S.%f')
+    # current_datetime = datetime.datetime.now()
+    # timestamp_datetime = current_datetime.strftime('%Y-%m-%d %H:%M:%S.%f')
 
     hold_requests['last_updated'] = timestamp_datetime
 
