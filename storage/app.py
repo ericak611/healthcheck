@@ -21,16 +21,6 @@ import mysql.connector
 import pymysql
 import os
 
-# with open('log_conf.yml', 'r') as f:
-#     log_config = yaml.safe_load(f.read())
-#     logging.config.dictConfig(log_config)
-
-# logger = logging.getLogger('basicLogger')
-
-# with open('app_conf.yml', 'r') as f:
-#     app_config = yaml.safe_load(f.read())
-
-
 if "TARGET_ENV" in os.environ and os.environ["TARGET_ENV"] == "test":
     print("In Test Environment")
     app_conf_file = "/config/app_conf.yml"
@@ -192,6 +182,7 @@ def process_messages():
 
 app = connexion.FlaskApp(__name__, specification_dir='')
 app.add_api("openapi.yaml",
+            base_path="/storage",
             strict_validation=True,
             validate_responses=True)
 

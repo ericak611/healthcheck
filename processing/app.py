@@ -12,14 +12,6 @@ import uuid
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask_cors import CORS, cross_origin
 
-# with open('app_conf.yml', 'r') as f:
-#     app_config = yaml.safe_load(f.read())
-    
-# with open('log_conf.yml', 'r') as f:
-#     log_config = yaml.safe_load(f.read())
-#     logging.config.dictConfig(log_config)
-
-# logger = logging.getLogger('basicLogger')
 
 if "TARGET_ENV" in os.environ and os.environ["TARGET_ENV"] == "test":
     print("In Test Environment")
@@ -143,12 +135,14 @@ def init_scheduler():
 
 app = connexion.FlaskApp(__name__, specification_dir='')
 app.add_api("openapi.yaml",
+            base_path="/processing",
             strict_validation=True,
             validate_responses=True)
 
 if __name__ == "__main__":
-    CORS(app.app)
-    app.app.config['CORS_HEADERS'] = 'Content-Type'
+    if "TARGET_ENV" not in os.environ or os.environ["TARGET_ENV"] != "test":
+        CORS(app.app)
+        app.app.config['CORS_HEADERS'] = 'Content-Type'
     # run our standalone gevent server
     init_scheduler()
     app.run(port=8100, use_reloader=False)
