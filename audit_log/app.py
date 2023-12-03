@@ -23,7 +23,9 @@ else:
     app_conf_file = "app_conf.yml"
     log_conf_file = "log_conf.yml"
 
-
+def get_health_status():
+    logger.info("service is running")
+    return 200
 
 with open(app_conf_file, 'r') as f:
     app_config = yaml.safe_load(f.read())

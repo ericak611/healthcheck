@@ -15,6 +15,18 @@ tags:
 - name: devices
   description: Operations available to a library computer kiosk.
 paths:
+  /health:
+    get:
+      tags:
+        - devices
+      summary: Returns status of the service
+      description: Returns the health status of the service
+      operationId: app.get_health_status
+      responses:
+        '200':
+          description: Service is running
+        '500':
+          description: Service is down
   /book:
     get:
       tags:

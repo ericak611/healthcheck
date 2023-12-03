@@ -34,6 +34,10 @@ logger = logging.getLogger('basicLogger')
 logger.info("App Conf File: %s" % app_conf_file)
 logger.info("Log Conf File: %s" % log_conf_file)
 
+def get_health_status():
+    logger.info("service is running")
+    return 200
+
 def populate_stats():
 
     # Log an INFO message 

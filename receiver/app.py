@@ -34,6 +34,9 @@ logger = logging.getLogger('basicLogger')
 logger.info("App Conf File: %s" % app_conf_file)
 logger.info("Log Conf File: %s" % log_conf_file)
 
+def get_health_status():
+    logger.info("service is running")
+    return 200
 
 def connect_to_kafka(hostname, app_config):
     retry_count = 0
