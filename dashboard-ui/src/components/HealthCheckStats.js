@@ -33,7 +33,7 @@ export default function AppStats() {
             <div>
             <h1>Health Status</h1>
             <p><strong>Receiver:</strong> {stats['receiver']}</p>
-            <p><strong>Storage:</strong> {stats['Storage']}</p>
+            <p><strong>Storage:</strong> {stats['storage']}</p>
             <p><strong>Processing:</strong> {stats['processing']}</p>
             <p><strong>Audit:</strong> {stats['audit']}</p>
             <p><strong>Last Update:</strong> {stats['last_update']}</p>
